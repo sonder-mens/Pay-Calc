@@ -1,0 +1,908 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sonder Mens — Pay Calculator</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0f1a14;--bg2:#162019;--bg3:#1c2a22;--bg4:#243428;--gold:#c9a94e;--gold-dim:#9a7d3a;--gold-bright:#e6c55a;--cream:#f0e8d4;--cream-dim:#c4b99a;--green-accent:#3a7d5c;--green-light:#4a9d70;--red:#c44b4b;--red-dim:#8a3535;--amber:#d4a03a;--text:#e8e0cc;--text-dim:#8a8472;--border:#2a3a2e;--radius:10px;--shadow:0 4px 20px rgba(0,0,0,0.3)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;line-height:1.5}
+h1,h2,h3,h4{font-family:'Cormorant Garamond',serif;font-weight:600;color:var(--cream)}
+.header{background:linear-gradient(135deg,var(--bg2),var(--bg3));border-bottom:1px solid var(--border);padding:20px 32px;display:flex;align-items:center;gap:20px}
+.header .logo{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:700;color:var(--gold);letter-spacing:3px;text-transform:uppercase}
+.header .subtitle{color:var(--text-dim);font-size:13px;letter-spacing:1px}
+.tab-bar{display:flex;gap:0;background:var(--bg2);border-bottom:2px solid var(--border);padding:0 24px;overflow-x:auto}
+.tab-btn{padding:14px 24px;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;color:var(--text-dim);border:none;background:none;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .2s;white-space:nowrap;letter-spacing:.5px}
+.tab-btn:hover{color:var(--cream)}.tab-btn.active{color:var(--gold);border-bottom-color:var(--gold)}
+.tab-content{display:none;padding:28px 32px;max-width:1400px;margin:0 auto}.tab-content.active{display:block}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:24px;margin-bottom:20px;box-shadow:var(--shadow)}
+.card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--border);flex-wrap:wrap;gap:8px}
+.card-title{font-size:22px;color:var(--gold)}
+label{font-size:12px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.8px;display:block;margin-bottom:4px}
+input[type="number"],input[type="text"],select{width:100%;padding:10px 12px;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;transition:border-color .2s}
+input:focus,select:focus{outline:none;border-color:var(--gold-dim)}
+.input-group{margin-bottom:14px}
+.input-row{display:grid;gap:14px}
+.c2{grid-template-columns:1fr 1fr}.c3{grid-template-columns:1fr 1fr 1fr}.c4{grid-template-columns:repeat(4,1fr)}.c5{grid-template-columns:repeat(5,1fr)}.c6{grid-template-columns:repeat(6,1fr)}
+.btn{padding:10px 20px;border:none;border-radius:6px;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;transition:all .2s;letter-spacing:.5px}
+.btn-gold{background:var(--gold);color:var(--bg)}.btn-gold:hover{background:var(--gold-bright)}
+.btn-outline{background:none;border:1px solid var(--border);color:var(--text-dim)}.btn-outline:hover{border-color:var(--gold-dim);color:var(--cream)}
+.btn-red{background:var(--red-dim);color:var(--cream)}.btn-red:hover{background:var(--red)}
+.btn-sm{padding:6px 14px;font-size:12px}
+.output-val{background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:10px 12px;font-size:14px;color:var(--gold);font-weight:500}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;padding:10px 12px;color:var(--gold-dim);font-weight:500;font-size:11px;text-transform:uppercase;letter-spacing:.8px;border-bottom:1px solid var(--border)}
+td{padding:10px 12px;border-bottom:1px solid rgba(42,58,46,0.5)}
+tr:hover td{background:rgba(201,169,78,0.03)}
+.badge{display:inline-block;padding:3px 10px;border-radius:12px;font-size:11px;font-weight:600}
+.badge-green{background:rgba(74,157,112,0.15);color:var(--green-light)}
+.badge-gold{background:rgba(201,169,78,0.15);color:var(--gold)}
+.badge-red{background:rgba(196,75,75,0.15);color:var(--red)}
+.alert{padding:12px 16px;border-radius:6px;font-size:13px;margin-bottom:16px;display:none}
+.alert-warn{background:rgba(212,160,58,0.1);border:1px solid rgba(212,160,58,0.3);color:var(--amber)}
+.wage-ok{color:var(--green-light)}.wage-warn{color:var(--amber)}.wage-over{color:var(--red)}
+.section-title{font-size:16px;color:var(--cream);margin:24px 0 12px}
+.divider{border:none;border-top:1px solid var(--border);margin:20px 0}
+.toggle{position:relative;display:inline-block;width:40px;height:22px}
+.toggle input{opacity:0;width:0;height:0}
+.toggle .slider{position:absolute;cursor:pointer;inset:0;background:var(--bg);border:1px solid var(--border);border-radius:22px;transition:.3s}
+.toggle .slider:before{content:"";position:absolute;height:16px;width:16px;left:2px;bottom:2px;background:var(--text-dim);border-radius:50%;transition:.3s}
+.toggle input:checked+.slider{background:var(--green-accent);border-color:var(--green-light)}
+.toggle input:checked+.slider:before{transform:translateX(18px);background:var(--cream)}
+.flex-between{display:flex;justify-content:space-between;align-items:center}
+.mt-12{margin-top:12px}.mb-8{margin-bottom:8px}
+.text-sm{font-size:12px}.text-dim{color:var(--text-dim)}
+.file-upload{border:2px dashed var(--border);border-radius:var(--radius);padding:32px;text-align:center;cursor:pointer;transition:border-color .2s;margin-bottom:16px}
+.file-upload:hover{border-color:var(--gold-dim)}.file-upload input{display:none}.file-upload .icon{font-size:32px;margin-bottom:8px}
+input[type="range"]{-webkit-appearance:none;width:100%;height:4px;background:var(--border);border-radius:2px;outline:none}
+input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;background:var(--gold);border-radius:50%;cursor:pointer}
+/* Drag and drop */
+.staff-chip{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;background:var(--bg);border:1px solid var(--border);border-radius:20px;font-size:13px;cursor:grab;margin:4px;transition:all .2s;user-select:none}
+.staff-chip:active{cursor:grabbing;opacity:0.7}
+.staff-chip .remove{cursor:pointer;opacity:0.4;font-size:11px}.staff-chip .remove:hover{opacity:1;color:var(--red)}
+.location-box{min-height:60px;border:2px dashed var(--border);border-radius:8px;padding:8px;margin-top:8px;transition:border-color .2s}
+.location-box.drag-over{border-color:var(--gold);background:rgba(201,169,78,0.05)}
+.tier-tabs{display:flex;gap:4px;margin-bottom:16px;flex-wrap:wrap}
+.tier-tab{padding:6px 16px;border-radius:20px;cursor:pointer;font-size:12px;font-weight:500;border:1px solid var(--border);background:var(--bg);color:var(--text-dim);transition:all .2s}
+.tier-tab.active{background:var(--gold);color:var(--bg);border-color:var(--gold)}
+.tier-tab:hover:not(.active){border-color:var(--gold-dim);color:var(--cream)}
+@media(max-width:768px){.tab-content{padding:16px}.c3,.c4,.c5,.c6{grid-template-columns:1fr 1fr}.header{padding:16px}.header .logo{font-size:20px}}
+@media print{body{background:#fff;color:#222}.header,.tab-bar{display:none}.tab-content{display:none!important}#tab-onboarding{display:block!important;padding:0}.card{border:1px solid #ccc;box-shadow:none;background:#fff}.no-print{display:none!important}.output-val{background:#f5f5f5;color:#222;border-color:#ccc}h1,h2,h3,h4,.card-title{color:#222}label{color:#666}td,th{color:#222;border-color:#ddd}}
+::-webkit-scrollbar{width:6px;height:6px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+</style>
+</head>
+<body>
+<div class="header"><div><div class="logo">Sonder Mens</div><div class="subtitle">Pay Structure Calculator</div></div></div>
+<div class="tab-bar">
+  <button class="tab-btn active" onclick="showTab('rate-builder')">Rate Builder</button>
+  <button class="tab-btn" onclick="showTab('wage-analysis')">Wage % Analysis</button>
+  <button class="tab-btn" onclick="showTab('tester')">Salary &amp; Commission Tester</button>
+  <button class="tab-btn" onclick="showTab('calculate')">Calculate Pay</button>
+  <button class="tab-btn" onclick="showTab('profiles')">Staff Profiles</button>
+  <button class="tab-btn" onclick="showTab('onboarding')">Onboarding Doc</button>
+</div>
+
+<!-- RATE BUILDER -->
+<div id="tab-rate-builder" class="tab-content active">
+  <div class="flex-between mb-8"><h2>Rate Builder</h2><button class="btn btn-gold" onclick="addStructure()">+ Add Structure</button></div>
+  <p class="text-sm text-dim" style="margin-bottom:20px">Enter price, base salary, commission budget, and unlock occupancy — rates and unlock $ are calculated automatically.</p>
+  <div id="structures-container"></div>
+</div>
+
+<!-- WAGE ANALYSIS -->
+<div id="tab-wage-analysis" class="tab-content">
+  <h2 style="margin-bottom:16px">Wage % Analysis</h2>
+  <p class="text-sm text-dim" style="margin-bottom:20px">Annualised cost of sales — base paid 52 weeks, commission earned 47 weeks, divided by 47 weeks revenue.</p>
+  <div class="card" style="margin-bottom:16px">
+    <div class="input-row c2">
+      <div class="input-group"><label>Select Structure</label><select id="wage-sel" onchange="renderWageAnalysis()"><option value="all">All</option></select></div>
+      <div class="input-group"><label>Occupancy Step</label><select id="wage-step" onchange="renderWageAnalysis()"><option value="5">5%</option><option value="10" selected>10%</option></select></div>
+    </div>
+  </div>
+  <div id="wage-container"></div>
+</div>
+
+<!-- TESTER -->
+<div id="tab-tester" class="tab-content">
+  <h2 style="margin-bottom:16px">Salary &amp; Commission Tester</h2>
+  <div class="card">
+    <div class="input-row c3">
+      <div class="input-group"><label>Annual Base ($)</label><input type="number" id="test-sal" value="55000" oninput="runTester()"></div>
+      <div class="input-group"><label>Annual Commission ($)</label><input type="number" id="test-comm" value="35000" oninput="runTester()"></div>
+      <div class="input-group"><label>Super Rate (%)</label><input type="number" id="test-super" value="12" oninput="runTester()"></div>
+    </div>
+    <div style="overflow-x:auto" class="mt-12">
+      <table><thead><tr><th>Price</th><th>Wkly Base</th><th>Wkly Comm</th><th>Wkly Super</th><th>Total Wkly</th><th>Max Rev ex-GST</th><th>Wage %</th></tr></thead><tbody id="tester-tbody"></tbody></table>
+    </div>
+  </div>
+</div>
+
+<!-- CALCULATE PAY -->
+<div id="tab-calculate" class="tab-content">
+  <h2 style="margin-bottom:16px">Calculate Pay</h2>
+  <div class="input-row c2">
+    <div class="file-upload" onclick="this.querySelector('input').click()">
+      <input type="file" accept=".csv" onchange="handlePerf(event)"><div class="icon">📊</div>
+      <div style="color:var(--cream);font-weight:500;margin-bottom:4px">Performance Summary CSV</div>
+      <div class="text-sm text-dim" id="perf-name">Click to upload</div>
+    </div>
+    <div class="file-upload" onclick="this.querySelector('input').click()">
+      <input type="file" accept=".csv" onchange="handleSales(event)"><div class="icon">🛒</div>
+      <div style="color:var(--cream);font-weight:500;margin-bottom:4px">Sales Log Detail CSV</div>
+      <div class="text-sm text-dim" id="sales-name">Click to upload</div>
+    </div>
+  </div>
+  <div id="calc-alert" class="alert alert-warn"></div>
+  <div id="calc-results" style="display:none">
+    <div class="card">
+      <div class="card-header"><h3 class="card-title">Weekly Pay Results</h3><div style="display:flex;gap:8px"><button class="btn btn-gold btn-sm" onclick="tryCalc()">Recalculate</button><button class="btn btn-outline btn-sm" onclick="downloadPaySummary()">Download Pay Summary</button><button class="btn btn-outline btn-sm" onclick="exportCSV()">Export CSV</button></div></div>
+      <div style="overflow-x:auto">
+        <table><thead><tr><th>Staff</th><th>Location</th><th>Structure</th><th>Svc Rev</th><th>Blak</th><th>Crew</th><th>Svc Comm</th><th>Prod Comm</th><th>Total Comm</th><th>Weekly Base</th><th>Total Pay</th></tr></thead><tbody id="calc-tbody"></tbody></table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- STAFF PROFILES -->
+<div id="tab-profiles" class="tab-content">
+  <div class="flex-between mb-8"><h2>Staff Profiles</h2>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-outline btn-sm" onclick="addLocation()">+ Location</button>
+      <button class="btn btn-gold" onclick="addStaff()">+ Staff</button>
+    </div>
+  </div>
+  <p class="text-sm text-dim" style="margin-bottom:20px">Drag staff between locations. Click a name to edit structure and settings.</p>
+  <div id="locations-container"></div>
+  <div class="card" style="margin-top:20px">
+    <h4 style="color:var(--gold);margin-bottom:12px">Unassigned</h4>
+    <div class="location-box" id="loc-unassigned" ondrop="dropStaff(event,'unassigned')" ondragover="dragOver(event)" ondragleave="dragLeave(event)"></div>
+  </div>
+</div>
+
+<!-- ONBOARDING -->
+<div id="tab-onboarding" class="tab-content">
+  <h2 style="margin-bottom:16px">Onboarding Document</h2>
+  <div class="card no-print">
+    <div class="input-row c2">
+      <div class="input-group"><label>Select Staff</label><select id="onboard-sel" onchange="genOnboard()"><option value="">— Select —</option></select></div>
+      <div class="input-group" style="display:flex;align-items:flex-end"><button class="btn btn-gold" onclick="window.print()">Print / Save PDF</button></div>
+    </div>
+  </div>
+  <div id="onboard-out"></div>
+</div>
+
+<!-- STAFF EDIT MODAL -->
+<div id="modal-bg" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:100;display:none;align-items:center;justify-content:center" onclick="if(event.target===this)closeModal()">
+  <div class="card" style="width:480px;max-width:90vw;max-height:90vh;overflow-y:auto" onclick="event.stopPropagation()">
+    <div class="card-header"><h3 class="card-title" id="modal-title">Edit Staff</h3><button class="btn btn-sm btn-outline" onclick="closeModal()">✕</button></div>
+    <div id="modal-body"></div>
+  </div>
+</div>
+
+<script>
+// ==================== CONSTANTS ====================
+const SUPER_RATE=0.12, GST=1.1, MAX_CUTS=63, WORK_WEEKS=47, PAY_WEEKS=52;
+const PROD_TIERS=[{min:0,max:149.99,blak:0,crew:0},{min:150,max:299.99,blak:6,crew:2},{min:300,max:449.99,blak:10,crew:4.5},{min:450,max:Infinity,blak:13,crew:4.5}];
+const STORAGE_KEY='sonder_pay_v7';
+
+// ==================== DEFAULT DATA ====================
+function defaultLocations(){
+  return ['Neutral Bay','Chatswood','Dee Why','Mona Vale','Drummoyne','Bondi Junction','Parramatta','Melbourne CBD'];
+}
+
+function defaultStructures(){
+  return [
+    {id:'50base',label:'$50 Base Only',price:50,base:35000,comm:0,tierType:'none'},
+    {id:'50std',label:'$50 Standard',price:50,base:35000,comm:10000,tierType:'single',t1Rate:0.26,t1Unlock:2169.65},
+    {id:'60std',label:'$60 Standard',price:60,base:45000,comm:10000,tierType:'single',t1Rate:0.26,t1Unlock:2795.22},
+    {id:'70std',label:'$70 Standard',price:70,base:55000,comm:25000,tierType:'two',t1Rate:0.285,t2Rate:0.41,t1Unlock:2745.036,t2Unlock:3797.30},
+    {id:'75std',label:'$75 Standard',price:75,base:55000,comm:30000,tierType:'two',t1Rate:0.36,t2Rate:0.425,t1Unlock:2598.75,t2Unlock:4402.95},
+    {id:'80std',label:'$80 Standard',price:80,base:55000,comm:35000,tierType:'two',t1Rate:0.29,t2Rate:0.425,t1Unlock:2494.725,t2Unlock:3991.56},
+    {id:'80spon',label:'Sponsorship $80',price:80,base:73000,comm:16800,tierType:'single',t1Rate:0.425,t1Unlock:3816.93},
+    {id:'85std',label:'$85 Standard',price:85,base:55000,comm:40000,tierType:'two',t1Rate:0.32,t2Rate:0.425,t1Unlock:2677.50,t2Unlock:4121.46},
+    {id:'90spon70',label:'Sponsorship $90 @70k',price:90,base:70000,comm:30000,tierType:'single',t1Rate:0.425,t1Unlock:3896.865},
+    {id:'90at65',label:'$90 @65k',price:90,base:70000,comm:35000,tierType:'two',t1Rate:0.28,t2Rate:0.425,t1Unlock:3083.85,t2Unlock:4608.954},
+    {id:'90std',label:'$90 Standard',price:90,base:55000,comm:45000,tierType:'two',t1Rate:0.36,t2Rate:0.425,t1Unlock:2803.5,t2Unlock:4317.39},
+    {id:'90spon',label:'Sponsorship $90',price:90,base:73000,comm:26800,tierType:'single',t1Rate:0.425,t1Unlock:4091.6148},
+    {id:'nocomm',label:'No Service Commission',price:90,base:55000,comm:0,tierType:'none'},
+    {id:'100std',label:'$100 Standard',price:100,base:55000,comm:55000,tierType:'two',t1Rate:0.33,t2Rate:0.425,t1Unlock:2338.875,t2Unlock:4503.114},
+    {id:'100spon',label:'$100 Sponsorship',price:100,base:75000,comm:35000,tierType:'single',t1Rate:0.425,t1Unlock:4141.30}
+  ];
+}
+
+function defaultStaff(){
+  return [
+    {name:'Mark Morcos',sid:'50std',noComm:false,loc:'Chatswood'},
+    {name:'Ethan Robinson',sid:'50std',noComm:false,loc:'unassigned'},
+    {name:'Oscar Lennon',sid:'50std',noComm:false,loc:'unassigned'},
+    {name:'Athan Kourafas',sid:'50base',noComm:true,loc:'unassigned'},
+    {name:'Charlie Regolo',sid:'60std',noComm:false,loc:'Neutral Bay'},
+    {name:'Dwayne Booth',sid:'60std',noComm:false,loc:'unassigned'},
+    {name:'Geordie Rhys Hillman',sid:'60std',noComm:false,loc:'unassigned'},
+    {name:'Hadi Zahr',sid:'60std',noComm:false,loc:'unassigned'},
+    {name:'Rhys Hillman',sid:'60std',noComm:false,loc:'Chatswood'},
+    {name:'Callum Leonard',sid:'70std',noComm:false,loc:'unassigned'},
+    {name:'Dylan Grande',sid:'70std',noComm:false,loc:'Drummoyne'},
+    {name:'Fernando Sanchez',sid:'70std',noComm:false,loc:'Chatswood'},
+    {name:'Jaiden Acallar',sid:'70std',noComm:false,loc:'unassigned'},
+    {name:'Josh Edwards',sid:'70std',noComm:false,loc:'Mona Vale'},
+    {name:'Rian Anderson',sid:'70std',noComm:false,loc:'Mona Vale'},
+    {name:'Rian Dyer',sid:'70std',noComm:false,loc:'unassigned'},
+    {name:'Brian Monnet',sid:'70std',noComm:false,loc:'unassigned'},
+    {name:'Connor Hinch',sid:'80std',noComm:false,loc:'Bondi Junction'},
+    {name:'Dan Toloza',sid:'80std',noComm:false,loc:'unassigned'},
+    {name:'Matteo Barbari',sid:'80std',noComm:false,loc:'Dee Why'},
+    {name:'Shay Stubblefield',sid:'80std',noComm:false,loc:'Parramatta'},
+    {name:'Willian Goncalves',sid:'80spon',noComm:false,loc:'unassigned'},
+    {name:'Lochlan Dudley',sid:'90spon70',noComm:false,loc:'Chatswood'},
+    {name:'Mario Del Buono',sid:'90at65',noComm:false,loc:'Mona Vale'},
+    {name:'Anthony Duong',sid:'90std',noComm:false,loc:'unassigned'},
+    {name:'Reece Massey',sid:'90spon',noComm:false,loc:'Chatswood'},
+    {name:'Damon Ratnagopal',sid:'nocomm',noComm:true,loc:'Dee Why'},
+    {name:'Ji Ratnagopal',sid:'nocomm',noComm:true,loc:'Dee Why'},
+    {name:'Karel Lloyd',sid:'nocomm',noComm:true,loc:'Mona Vale'},
+    {name:'Samuel Raffaele',sid:'nocomm',noComm:true,loc:'Neutral Bay'},
+    {name:'Ron Quiliquite',sid:'100std',noComm:false,loc:'Dee Why'},
+    {name:'Avi Krishan',sid:'50base',noComm:true,loc:'Parramatta'},
+    {name:'Axel Coria',sid:'50base',noComm:true,loc:'Mona Vale'},
+    {name:'Jimmi Nguyen',sid:'50base',noComm:true,loc:'Parramatta'},
+  ];
+}
+
+// ==================== STATE ====================
+let state={structures:[],staff:[],locations:[]};
+function load(){
+  try{
+    const s=localStorage.getItem(STORAGE_KEY);
+    if(s){
+      state=JSON.parse(s);
+      // Merge in any new default structures added since last save (by id)
+      const defs=defaultStructures();
+      const existingIds=new Set((state.structures||[]).map(x=>x.id));
+      let added=false;
+      defs.forEach(d=>{if(!existingIds.has(d.id)){state.structures.push(d);added=true}});
+      if(added){
+        // Re-sort by price so new ones land in the right spot visually
+        state.structures.sort((a,b)=>(a.price||0)-(b.price||0));
+        save();
+      }
+      return;
+    }
+  }catch(e){}
+  state.structures=defaultStructures();state.staff=defaultStaff();state.locations=defaultLocations();save();
+}
+function save(){localStorage.setItem(STORAGE_KEY,JSON.stringify(state))}
+
+// ==================== HELPERS ====================
+const fmt=n=>'$'+Number(n).toLocaleString('en-AU',{minimumFractionDigits:0,maximumFractionDigits:0});
+const fmt2=n=>'$'+Number(n).toLocaleString('en-AU',{minimumFractionDigits:2,maximumFractionDigits:2});
+const pct=n=>(n*100).toFixed(1)+'%';
+const wc=w=>w<=0.40?'wage-ok':w<=0.47?'wage-warn':'wage-over';
+const maxRevInc=p=>MAX_CUTS*p;
+const maxRevEx=p=>MAX_CUTS*p/GST;
+
+function calcComm(s,revIncGst,useIncGst){
+  if(!s||s.tierType==='none'||s.comm===0)return 0;
+  const superDiv=1+SUPER_RATE;
+  // If useIncGst, apply rates to inc GST revenue directly (legacy mode)
+  // Otherwise apply to ex GST (correct mode)
+  const rev=useIncGst?revIncGst:revIncGst/GST;
+  const divU=useIncGst?1:GST;
+  let c=0;
+  if(s.tierType==='single'){
+    const u=(s.t1Unlock||0)/divU;
+    if(rev>u)c=(rev-u)*(s.t1Rate||0);
+  }else if(s.tierType==='two'){
+    const u1=(s.t1Unlock||0)/divU,u2=(s.t2Unlock||0)/divU;
+    if(rev>u1){c=Math.max(0,Math.min(rev,u2)-u1)*(s.t1Rate||0);if(rev>u2)c+=(rev-u2)*(s.t2Rate||0)}
+  }
+  return c/superDiv;
+}
+
+function calcDetails(s){
+  const mri=maxRevInc(s.price),mre=maxRevEx(s.price),wb=s.base/PAY_WEEKS,wc2=s.comm/WORK_WEEKS;
+  const ws=(wb+wc2)*SUPER_RATE,twc=wb+wc2+ws,wpm=twc/mre;
+  let t1ui=0,t1ue=0,t1c=0,t1o=0,t2ui=0,t2ue=0,t2c=0,t2o=0;
+  if(s.tierType!=='none'&&s.comm>0){
+    t1ui=s.t1Unlock||0;t1ue=t1ui/GST;t1c=Math.ceil(t1ui/s.price);t1o=mri>0?t1ui/mri:0;
+    if(s.tierType==='two'){t2ui=s.t2Unlock||0;t2ue=t2ui/GST;t2c=Math.ceil(t2ui/s.price);t2o=mri>0?t2ui/mri:0}
+  }
+  return{wb,wc:wc2,ws,twc,wpm,t1ui,t1ue,t1c,t1o,t2ui,t2ue,t2c,t2o,mri,mre,commMax:calcComm(s,mri)};
+}
+
+// Auto-calculate unlocks and rates from budget
+function autoCalc(s){
+  if(s.comm<=0||s.tierType==='none')return;
+  const mri=maxRevInc(s.price),mre=maxRevEx(s.price);
+  const wci=s.comm*(1+SUPER_RATE)/WORK_WEEKS; // weekly comm inc super
+  if(s.tierType==='single'){
+    // Single tier: unlock from occupancy, rate = 42.5% default or custom
+    // If user set t1OccInput, compute unlock from it
+    const occ=s.t1OccInput||0.50;
+    s.t1Unlock=mri*occ;
+    const range=mre-(s.t1Unlock/GST);
+    if(range>0)s.t1Rate=wci/range; else s.t1Rate=0;
+  }else if(s.tierType==='two'){
+    // Two tier: T2 rate fixed at 42.5%, 50/50 split, T1 unlock from occupancy
+    const occ=s.t1OccInput||0.50;
+    s.t1Unlock=mri*occ;
+    const half=wci/2;
+    const t2r=s.t2Rate||0.425;
+    const t2ue=mre-half/t2r;
+    s.t2Unlock=t2ue*GST;
+    const t1range=t2ue-(s.t1Unlock/GST);
+    if(t1range>0)s.t1Rate=half/t1range; else s.t1Rate=0;
+  }
+}
+
+// ==================== RATE BUILDER ====================
+let activeSI=0;
+function renderRB(){
+  const c=document.getElementById('structures-container');c.innerHTML='';
+  const groups={};
+  state.structures.forEach((s,i)=>{if(!groups[s.price])groups[s.price]=[];groups[s.price].push({s,i})});
+  Object.keys(groups).sort((a,b)=>a-b).forEach(price=>{
+    const items=groups[price];
+    const card=document.createElement('div');card.className='card';
+    const ai=items.findIndex(x=>x.i===activeSI);
+    const ci=ai>=0?ai:0;
+    const s=items[ci].s,si=items[ci].i;
+    const d=calcDetails(s);
+    let tHtml='';
+    if(s.tierType==='single'&&s.comm>0){
+      tHtml=`<hr class="divider"><div class="section-title">Commission — Single Tier</div>
+      <div class="input-row c4 mt-12">
+        <div class="input-group"><label>Unlock Occupancy (%)</label><input type="number" step="1" value="${((s.t1OccInput||d.t1o)*100).toFixed(0)}" onchange="updOcc(${si},+this.value/100)"></div>
+        <div class="input-group"><label>Unlock $ (inc GST)</label><div class="output-val">${fmt(d.t1ui)} (${d.t1c} cuts)</div></div>
+        <div class="input-group"><label>Rate (auto)</label><div class="output-val">${(s.t1Rate*100).toFixed(1)}%</div></div>
+        <div class="input-group"><label>Comm at max (ex super/wk)</label><div class="output-val">${fmt2(d.commMax)}</div></div>
+      </div>`;
+    }else if(s.tierType==='two'){
+      tHtml=`<hr class="divider"><div class="section-title">Commission — Two Tier (T2 fixed at ${((s.t2Rate||0.425)*100).toFixed(1)}%, 50/50 split)</div>
+      <div class="input-row c6 mt-12">
+        <div class="input-group"><label>T1 Unlock Occ (%)</label><input type="number" step="1" value="${((s.t1OccInput||d.t1o)*100).toFixed(0)}" onchange="updOcc(${si},+this.value/100)"></div>
+        <div class="input-group"><label>T1 Unlock $</label><div class="output-val">${fmt(d.t1ui)} (${d.t1c} cuts)</div></div>
+        <div class="input-group"><label>T1 Rate (auto)</label><div class="output-val">${(s.t1Rate*100).toFixed(1)}%</div></div>
+        <div class="input-group"><label>T2 Unlock $</label><div class="output-val">${fmt(d.t2ui)} (${d.t2c} cuts)</div></div>
+        <div class="input-group"><label>T2 Rate</label><input type="number" step="0.5" value="${((s.t2Rate||0.425)*100).toFixed(1)}" onchange="updS(${si},'t2Rate',+this.value/100)"></div>
+        <div class="input-group"><label>Comm at max (ex super/wk)</label><div class="output-val">${fmt2(d.commMax)}</div></div>
+      </div>`;
+    }
+    card.innerHTML=`
+      <div class="card-header">
+        <div style="display:flex;align-items:center;gap:12px"><h3 class="card-title">$${price} Haircut</h3><span class="text-sm text-dim">Max: ${fmt(d.mre)} ex-GST/wk</span></div>
+        <div style="display:flex;gap:8px"><button class="btn btn-outline btn-sm" onclick="dupStructure(${si})">Duplicate</button><button class="btn btn-red btn-sm" onclick="delStructure(${si})">✕</button></div>
+      </div>
+      <div class="tier-tabs">${items.map((x,j)=>`<div class="tier-tab ${j===ci?'active':''}" onclick="activeSI=${x.i};renderRB()">${x.s.label.replace('$'+price+' ','').replace('$'+price,'').trim()||x.s.label}</div>`).join('')}</div>
+      <div class="input-row c5">
+        <div class="input-group"><label>Label</label><input type="text" value="${s.label}" onchange="updS(${si},'label',this.value)"></div>
+        <div class="input-group"><label>Base Salary (ex super)</label><input type="number" value="${s.base}" onchange="updS(${si},'base',+this.value)"></div>
+        <div class="input-group"><label>Commission Budget (ex super)</label><input type="number" value="${s.comm}" onchange="updS(${si},'comm',+this.value)"></div>
+        <div class="input-group"><label>Tier Type</label><select onchange="updS(${si},'tierType',this.value)"><option value="none" ${s.tierType==='none'?'selected':''}>None</option><option value="single" ${s.tierType==='single'?'selected':''}>Single</option><option value="two" ${s.tierType==='two'?'selected':''}>Two Tier</option></select></div>
+        <div class="input-group"><label>Wage % at Max</label><div class="output-val ${wc(d.wpm)}">${pct(d.wpm)}</div></div>
+      </div>
+      ${tHtml}
+      <hr class="divider">
+      <div class="input-row c4">
+        <div class="input-group"><label>Weekly Base</label><div class="output-val">${fmt2(d.wb)}</div></div>
+        <div class="input-group"><label>Weekly Comm Budget</label><div class="output-val">${fmt2(d.wc)}</div></div>
+        <div class="input-group"><label>Total Package</label><div class="output-val">${fmt(s.base+s.comm)} ex super</div></div>
+        <div class="input-group"><label>Inc Super</label><div class="output-val">${fmt((s.base+s.comm)*(1+SUPER_RATE))}</div></div>
+      </div>`;
+    c.appendChild(card);
+  });
+}
+function updS(si,k,v){state.structures[si][k]=v;if(k==='comm'||k==='tierType'||k==='t2Rate')autoCalc(state.structures[si]);save();renderRB()}
+function updOcc(si,v){state.structures[si].t1OccInput=v;autoCalc(state.structures[si]);save();renderRB()}
+function addStructure(){
+  const p=prompt('Haircut price?','80');if(!p)return;
+  const id='s_'+Date.now();
+  state.structures.push({id,label:'$'+p+' New',price:+p,base:55000,comm:0,tierType:'none'});
+  activeSI=state.structures.length-1;save();renderRB();
+}
+function dupStructure(si){
+  const o=state.structures[si],n={...o,id:'s_'+Date.now(),label:o.label+' Copy'};
+  state.structures.push(n);activeSI=state.structures.length-1;save();renderRB();
+}
+function delStructure(si){
+  if(!confirm('Delete '+state.structures[si].label+'?'))return;
+  const sid=state.structures[si].id;state.structures.splice(si,1);
+  state.staff.forEach(s=>{if(s.sid===sid)s.sid=state.structures[0]?.id||''});
+  if(activeSI>=state.structures.length)activeSI=0;save();renderRB();renderProfiles();
+}
+
+// ==================== WAGE ANALYSIS ====================
+function popWageSel(){
+  const sel=document.getElementById('wage-sel');const v=sel.value;
+  sel.innerHTML='<option value="all">All</option>';
+  state.structures.forEach((s,i)=>sel.innerHTML+=`<option value="${i}">${s.label}</option>`);
+  sel.value=v;
+}
+function renderWageAnalysis(){
+  popWageSel();
+  const c=document.getElementById('wage-container');c.innerHTML='';
+  const sv=document.getElementById('wage-sel').value;
+  const step=+document.getElementById('wage-step').value||10;
+  const occs=[];for(let o=50;o<=100;o+=step)occs.push(o);if(occs[occs.length-1]!==100)occs.push(100);
+  const list=sv==='all'?state.structures.filter(s=>s.base>0):[state.structures[+sv]].filter(Boolean);
+  list.forEach(s=>{
+    const mri=maxRevInc(s.price),mre=maxRevEx(s.price),abi=s.base*(1+SUPER_RATE);
+    let rows='';
+    occs.forEach(occ=>{
+      const f=occ/100,ri=mri*f,cw=calcComm(s,ri);
+      const aci=abi+cw*WORK_WEEKS*(1+SUPER_RATE),ar=ri*WORK_WEEKS;
+      const wp=ar>0?aci/ar:0;
+      let tl='Base only';
+      if(s.tierType!=='none'&&s.comm>0){
+        const t1f=mri>0?(s.t1Unlock||0)/mri:1;
+        if(s.tierType==='single')tl=f>=t1f?'Earning':'Below unlock';
+        else{const t2f=mri>0?(s.t2Unlock||0)/mri:1;tl=f>=t2f?'Tier 2':f>=t1f?'Tier 1':'Below unlock'}
+      }
+      rows+=`<tr><td style="color:var(--cream)">${occ}%</td><td>${fmt2(ri)}/wk</td><td>${fmt2(cw)}/wk</td><td>${fmt(aci)}</td><td>${fmt(ar)}</td><td class="${wc(wp)}" style="font-weight:600">${pct(wp)}</td><td><span class="badge ${tl.includes('2')?'badge-gold':tl.includes('1')||tl==='Earning'?'badge-green':'badge-red'}">${tl}</span></td></tr>`;
+    });
+    const d=calcDetails(s),card=document.createElement('div');card.className='card';
+    card.innerHTML=`<div class="card-header"><h3 class="card-title">${s.label}</h3><span class="text-sm text-dim">Base: ${fmt(s.base)} | Comm: ${fmt(s.comm)}</span></div>
+      <div style="overflow-x:auto"><table><thead><tr><th>Occ</th><th>Revenue</th><th>Commission</th><th>Annual Cost</th><th>Annual Rev</th><th>Wage %</th><th>Tier</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+    c.appendChild(card);
+  });
+}
+
+// ==================== TESTER ====================
+function runTester(){
+  const sal=+document.getElementById('test-sal').value||0,com=+document.getElementById('test-comm').value||0,sr=(+document.getElementById('test-super').value||12)/100;
+  const wb=sal/PAY_WEEKS,wcom=com/WORK_WEEKS,ws=(wb+wcom)*sr,tot=wb+wcom+ws;
+  const tb=document.getElementById('tester-tbody');tb.innerHTML='';
+  [...new Set(state.structures.map(s=>s.price))].sort((a,b)=>a-b).forEach(p=>{
+    const mr=maxRevEx(p),w=tot/mr;
+    tb.innerHTML+=`<tr><td style="color:var(--gold)">$${p}</td><td>${fmt2(wb)}</td><td>${fmt2(wcom)}</td><td>${fmt2(ws)}</td><td>${fmt2(tot)}</td><td>${fmt(mr)}</td><td class="${wc(w)}">${pct(w)}</td></tr>`;
+  });
+}
+
+// ==================== CALCULATE PAY ====================
+let perfData=null,salesData=null,calcResults=[];
+function parseCSV(t){const ls=t.split('\n').filter(l=>l.trim());if(!ls.length)return{headers:[],rows:[]};const sep=ls[0].includes('\t')?'\t':',';const h=parseLine(ls[0],sep).map(x=>x.trim());return{headers:h,rows:ls.slice(1).map(l=>parseLine(l,sep).map(x=>x.trim()))};}
+function parseLine(l,sep){const r=[];let c='',q=false;for(let i=0;i<l.length;i++){const ch=l[i];if(ch==='"'){if(q&&l[i+1]==='"'){c+='"';i++}else q=!q}else if(ch===sep&&!q){r.push(c);c=''}else c+=ch}r.push(c);return r}
+function parseAmt(s){if(!s)return 0;let v=String(s).replace(/[^0-9.,\-]/g,'');if(v.includes(',')&&(v.indexOf('.')< 0||v.indexOf(',')>v.lastIndexOf('.')))v=v.replace(/\./g,'').replace(',','.');else v=v.replace(/,/g,'');return parseFloat(v)||0}
+function fci(h,...ps){for(const p of ps){const i=h.findIndex(x=>p.test(x));if(i>=0)return i}return 0}
+function fuzzy(a,b){return a.toLowerCase().replace(/[^a-z]/g,'')===b.toLowerCase().replace(/[^a-z]/g,'')}
+function findStaff(n){return state.staff.find(s=>fuzzy(s.name,n))}
+
+function handlePerf(e){const f=e.target.files[0];if(!f)return;document.getElementById('perf-name').textContent=f.name;const r=new FileReader();r.onload=ev=>{perfData=parseCSV(ev.target.result);tryCalc()};r.readAsText(f)}
+function handleSales(e){const f=e.target.files[0];if(!f)return;document.getElementById('sales-name').textContent=f.name;const r=new FileReader();r.onload=ev=>{salesData=parseCSV(ev.target.result);tryCalc()};r.readAsText(f)}
+
+function tryCalc(){
+  if(!perfData||!perfData.rows.length)return;
+  const al=document.getElementById('calc-alert'),unrec=[];
+  const h=perfData.headers,ni=fci(h,/^team\s*member$/i,/^staff$/i),si=fci(h,/^services$/i);
+  const pc={};
+  if(salesData&&salesData.rows.length){
+    const sh=salesData.headers,ti=fci(sh,/^type$/i),ci=fci(sh,/^category$/i),sti=fci(sh,/^team\s*member$/i);
+    const qi=sh.findIndex(x=>/^qty$/i.test(x)||/^quantity$/i.test(x));
+    const pi=sh.findIndex(x=>/^total\s*sales$/i.test(x)||/^net\s*sales$/i.test(x));
+    salesData.rows.forEach(r=>{
+      if((r[ti]||'').toLowerCase()!=='product')return;
+      const cat=(r[ci]||'').toLowerCase(),staff=(r[sti]||'').trim();if(!staff)return;
+      if(!pc[staff])pc[staff]={blak:0,crew:0,rev:0};
+      const qty=qi>=0?(parseInt(r[qi])||1):1;
+      const price=Math.abs(parseAmt(r[pi>=0?pi:0]||'0'));
+      pc[staff].rev+=price;
+      if(cat.includes('blak'))pc[staff].blak+=qty;
+      else if(cat.includes('crew')||cat.includes('american'))pc[staff].crew+=qty;
+    });
+  }
+  calcResults=[];
+  perfData.rows.forEach(row=>{
+    const name=(row[ni]||'').trim();if(!name||/^total$/i.test(name)||/^average$/i.test(name))return;
+    let prof=findStaff(name);
+    if(!prof){unrec.push(name);prof={name,sid:state.structures[0]?.id||'',noComm:false,loc:'unassigned'};state.staff.push(prof)}
+    const st=state.structures.find(x=>x.id===prof.sid);
+    const revI=parseAmt(row[si]),revE=revI/GST;
+    let svcC=0;if(st&&!prof.noComm)svcC=calcComm(st,revI,prof.incGst);
+    let p={blak:0,crew:0,rev:0};if(pc[name])p=pc[name];else{const mk=Object.keys(pc).find(k=>fuzzy(k,name));if(mk)p=pc[mk]}
+    const pt=PROD_TIERS.find(t=>p.rev>=t.min&&p.rev<=t.max)||PROD_TIERS[0];
+    const prodC=p.blak*pt.blak+p.crew*pt.crew;
+    const wb=st?st.base/PAY_WEEKS:0;
+    calcResults.push({name,loc:prof.loc||'unassigned',struct:st?.label||'—',revI,revE,blak:p.blak,crew:p.crew,svcC,prodC,totC:svcC+prodC,wb,totPay:wb+svcC+prodC});
+  });
+  if(unrec.length){al.style.display='block';al.textContent='⚠ New staff: '+unrec.join(', ')+'. Assign in Staff Profiles.'}else al.style.display='none';
+  save();renderCalc();renderProfiles();popOnboard();
+}
+function renderCalc(){
+  const tb=document.getElementById('calc-tbody');tb.innerHTML='';
+  document.getElementById('calc-results').style.display=calcResults.length?'block':'none';
+  calcResults.sort((a,b)=>b.totC-a.totC);
+  calcResults.forEach(r=>{
+    tb.innerHTML+=`<tr><td style="font-weight:500">${r.name}</td><td>${r.loc}</td><td><span class="badge badge-gold">${r.struct}</span></td><td>${fmt2(r.revI)}</td><td>${r.blak}</td><td>${r.crew}</td><td>${fmt2(r.svcC)}</td><td>${fmt2(r.prodC)}</td><td style="color:var(--gold);font-weight:600">${fmt2(r.totC)}</td><td>${fmt2(r.wb)}</td><td style="font-weight:600">${fmt2(r.totPay)}</td></tr>`;
+  });
+}
+function exportCSV(){
+  if(!calcResults.length)return;
+  let c='Staff,Location,Structure,Svc Rev,Blak,Crew,Svc Comm,Prod Comm,Total Comm,Weekly Base,Total Pay\n';
+  calcResults.forEach(r=>c+=`"${r.name}","${r.loc}","${r.struct}",${r.revI.toFixed(2)},${r.blak},${r.crew},${r.svcC.toFixed(2)},${r.prodC.toFixed(2)},${r.totC.toFixed(2)},${r.wb.toFixed(2)},${r.totPay.toFixed(2)}\n`);
+  const b=new Blob([c],{type:'text/csv'}),a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='sonder_pay.csv';a.click();
+}
+
+function downloadPaySummary(){
+  if(!calcResults.length)return;
+  // Group by location
+  const byLoc={};
+  calcResults.forEach(r=>{
+    const loc=r.loc||'Unassigned';
+    if(!byLoc[loc])byLoc[loc]=[];
+    byLoc[loc].push(r);
+  });
+  const date=new Date().toLocaleDateString('en-AU',{day:'numeric',month:'long',year:'numeric'});
+  let html=`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Pay Summary</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:Arial,sans-serif;padding:40px;color:#222;max-width:800px;margin:0 auto}
+h1{font-size:24px;margin-bottom:4px}
+.date{color:#666;font-size:14px;margin-bottom:32px}
+.loc-title{font-size:18px;font-weight:700;margin:24px 0 8px;padding-bottom:6px;border-bottom:2px solid #c9a94e;color:#1a2e1f}
+table{width:100%;border-collapse:collapse;margin-bottom:24px}
+th{text-align:left;padding:8px 12px;font-size:11px;text-transform:uppercase;color:#666;border-bottom:1px solid #ddd}
+td{padding:10px 12px;border-bottom:1px solid #eee;font-size:14px}
+.amount{font-weight:700;font-size:16px;text-align:right}
+.total-row td{border-top:2px solid #333;font-weight:700}
+.footer{margin-top:32px;font-size:11px;color:#999;text-align:center}
+@media print{body{padding:20px}}
+</style></head><body>
+<h1>SONDER MENS — Weekly Pay Summary</h1>
+<div class="date">${date}</div>
+<p style="margin-bottom:24px;font-size:13px;color:#666">Commission amounts below are <strong>ex super</strong>. Enter into Xero as commission — super is added automatically.</p>`;
+
+  const locOrder=[...state.locations,'unassigned'];
+  let grandTotal=0;
+  locOrder.forEach(loc=>{
+    const staff=byLoc[loc];if(!staff||!staff.length)return;
+    const locLabel=loc==='unassigned'?'Unassigned':loc;
+    html+=`<div class="loc-title">${locLabel}</div><table><thead><tr><th>Name</th><th style="text-align:right">Commission to Pay</th></tr></thead><tbody>`;
+    let locTotal=0;
+    staff.sort((a,b)=>a.name.localeCompare(b.name)).forEach(r=>{
+      html+=`<tr><td>${r.name}</td><td class="amount">${fmt2(r.totC)}</td></tr>`;
+      locTotal+=r.totC;
+    });
+    html+=`<tr class="total-row"><td>${locLabel} Total</td><td class="amount">${fmt2(locTotal)}</td></tr>`;
+    html+=`</tbody></table>`;
+    grandTotal+=locTotal;
+  });
+  html+=`<div style="text-align:right;font-size:18px;font-weight:700;margin-top:16px;padding-top:12px;border-top:3px solid #1a2e1f">Grand Total: ${fmt2(grandTotal)}</div>`;
+  html+=`<div class="footer">Generated by Sonder Mens Pay Calculator</div></body></html>`;
+  
+  const blob=new Blob([html],{type:'text/html'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+  a.download='pay_summary_'+new Date().toISOString().slice(0,10)+'.html';a.click();
+}
+
+// ==================== STAFF PROFILES ====================
+let draggedStaff=null;
+function renderProfiles(){
+  const lc=document.getElementById('locations-container');lc.innerHTML='';
+  state.locations.forEach(loc=>{
+    const staff=state.staff.filter(s=>s.loc===loc);
+    const div=document.createElement('div');div.className='card';
+    div.innerHTML=`<div class="card-header"><h4 style="color:var(--gold)">${loc}</h4><div style="display:flex;gap:8px"><button class="btn btn-outline btn-sm" onclick="renameLocation('${loc}')">Rename</button><button class="btn btn-red btn-sm" onclick="delLocation('${loc}')">✕</button></div></div>
+      <div class="location-box" id="loc-${loc.replace(/\s/g,'_')}" ondrop="dropStaff(event,'${loc}')" ondragover="dragOver(event)" ondragleave="dragLeave(event)">${staff.map(s=>chipHTML(s)).join('')}</div>`;
+    lc.appendChild(div);
+  });
+  // Unassigned
+  const ua=state.staff.filter(s=>!s.loc||s.loc==='unassigned');
+  document.getElementById('loc-unassigned').innerHTML=ua.map(s=>chipHTML(s)).join('');
+}
+function chipHTML(s){
+  const st=state.structures.find(x=>x.id===s.sid);
+  return `<div class="staff-chip" draggable="true" ondragstart="dragStart(event,'${s.name}')" onclick="editStaff('${s.name}')">
+    <span>${s.name}</span><span class="text-sm text-dim">${st?.label||'—'}</span>
+    ${s.noComm?'<span class="badge badge-red" style="font-size:9px">No Comm</span>':''}
+  </div>`;
+}
+function dragStart(e,name){draggedStaff=name;e.dataTransfer.effectAllowed='move'}
+function dragOver(e){e.preventDefault();e.currentTarget.classList.add('drag-over')}
+function dragLeave(e){e.currentTarget.classList.remove('drag-over')}
+function dropStaff(e,loc){
+  e.preventDefault();e.currentTarget.classList.remove('drag-over');
+  if(!draggedStaff)return;
+  const s=state.staff.find(x=>x.name===draggedStaff);
+  if(s){s.loc=loc;save();renderProfiles()}
+  draggedStaff=null;
+}
+function addStaff(){
+  const n=prompt('Staff name?');if(!n)return;
+  state.staff.push({name:n,sid:state.structures[0]?.id||'',noComm:false,loc:'unassigned'});
+  save();renderProfiles();popOnboard();
+}
+function addLocation(){
+  const n=prompt('Location name?');if(!n)return;
+  if(!state.locations.includes(n)){state.locations.push(n);save();renderProfiles()}
+}
+function renameLocation(old){
+  const n=prompt('New name?',old);if(!n||n===old)return;
+  const i=state.locations.indexOf(old);if(i>=0)state.locations[i]=n;
+  state.staff.forEach(s=>{if(s.loc===old)s.loc=n});save();renderProfiles();
+}
+function delLocation(loc){
+  if(!confirm('Delete '+loc+'? Staff will be unassigned.'))return;
+  state.locations=state.locations.filter(l=>l!==loc);
+  state.staff.forEach(s=>{if(s.loc===loc)s.loc='unassigned'});save();renderProfiles();
+}
+
+// Staff edit modal
+function editStaff(name){
+  const s=state.staff.find(x=>x.name===name);if(!s)return;
+  document.getElementById('modal-title').textContent=s.name;
+  const opts=state.structures.map(st=>`<option value="${st.id}" ${st.id===s.sid?'selected':''}>${st.label}</option>`).join('');
+  document.getElementById('modal-body').innerHTML=`
+    <div class="input-group"><label>Structure</label><select id="m-struct" onchange="modalSave('${name}')">${opts}</select></div>
+    <div class="input-group" style="display:flex;align-items:center;gap:12px;margin-top:12px">
+      <label style="margin:0">No Service Commission</label>
+      <label class="toggle"><input type="checkbox" id="m-nocomm" ${s.noComm?'checked':''} onchange="modalSave('${name}')"><span class="slider"></span></label>
+    </div>
+    <div class="input-group" style="display:flex;align-items:center;gap:12px;margin-top:12px">
+      <label style="margin:0">Calculate on Inc GST</label>
+      <label class="toggle"><input type="checkbox" id="m-incgst" ${s.incGst?'checked':''} onchange="modalSave('${name}')"><span class="slider"></span></label>
+      <span class="text-sm text-dim">Default is ex GST. Turn on to match legacy sheet.</span>
+    </div>
+    <div style="margin-top:20px;display:flex;gap:8px">
+      <button class="btn btn-red btn-sm" onclick="delStaff('${name}')">Remove Staff</button>
+    </div>`;
+  document.getElementById('modal-bg').style.display='flex';
+}
+function modalSave(name){
+  const s=state.staff.find(x=>x.name===name);if(!s)return;
+  s.sid=document.getElementById('m-struct').value;
+  s.noComm=document.getElementById('m-nocomm').checked;
+  s.incGst=document.getElementById('m-incgst').checked;
+  save();renderProfiles();
+}
+function closeModal(){document.getElementById('modal-bg').style.display='none'}
+function delStaff(name){
+  if(!confirm('Remove '+name+'?'))return;
+  state.staff=state.staff.filter(s=>s.name!==name);save();closeModal();renderProfiles();popOnboard();
+}
+
+// ==================== ONBOARDING ====================
+function popOnboard(){
+  const sel=document.getElementById('onboard-sel');const v=sel.value;
+  sel.innerHTML='<option value="">— Select —</option>';
+  state.staff.forEach((s,i)=>sel.innerHTML+=`<option value="${i}">${s.name}</option>`);
+  if(v)sel.value=v;
+}
+function genOnboard(){
+  const si=+document.getElementById('onboard-sel').value,out=document.getElementById('onboard-out');
+  if(isNaN(si)){out.innerHTML='';return}
+  const s=state.staff[si];if(!s){out.innerHTML='';return}
+  const st=state.structures.find(x=>x.id===s.sid);
+  if(!st){out.innerHTML='<p class="text-dim">No structure assigned.</p>';return}
+  const d=calcDetails(st);
+  const priceEx=(st.price/GST).toFixed(2);
+  
+  // Build a worked example at ~85% occupancy
+  const exOcc=0.85;
+  const exCuts=Math.round(MAX_CUTS*exOcc);
+  const exRevInc=exCuts*st.price;
+  const exRevEx=exRevInc/GST;
+  const exCommGross=calcComm(st,exRevInc,s.incGst); // ex-super (what hits payslip as gross)
+  const exSuper=exCommGross*SUPER_RATE;              // super component
+  const exCommWhole=exCommGross+exSuper;             // whole commission earned
+  
+  // Occupancy scenarios table (70/80/90/100%)
+  const occScenarios=[0.70,0.80,0.90,1.00].map(o=>{
+    const cuts=Math.round(MAX_CUTS*o);
+    const riInc=cuts*st.price;
+    const cGross=calcComm(st,riInc,s.incGst);
+    const cSuper=cGross*SUPER_RATE;
+    const whole=cGross+cSuper;
+    const total=d.wb+cGross;
+    return{occ:o,cuts,riInc,whole,cGross,cSuper,total};
+  });
+  
+  // Tier explanation
+  let tierExplain='';
+  if(st.comm>0&&!s.noComm){
+    if(st.tierType==='single'){
+      tierExplain=`
+        <div style="background:#f8f5eb;border-radius:8px;padding:20px;margin:16px 0">
+          <h4 style="color:#1a2e1f;margin-bottom:12px">How Your Commission Works</h4>
+          <p style="margin-bottom:12px">Your commission has one tier. Once your weekly service revenue goes above a target, you start earning commission on every dollar above that target.</p>
+          <div style="background:#fff;border:1px solid #ddd;border-radius:6px;padding:16px;margin:12px 0">
+            <p style="margin-bottom:8px"><strong>Your unlock target:</strong> ${fmt(d.t1ui)} per week (inc GST)</p>
+            <p style="margin-bottom:8px"><strong>That's roughly ${d.t1c} haircuts</strong> at $${st.price} each</p>
+            <p><strong>Your rate:</strong> For every dollar above ${fmt(d.t1ui)}, you earn <strong>${(st.t1Rate*100).toFixed(1)} cents</strong></p>
+          </div>
+          <p style="font-size:13px;color:#666;margin-top:8px">Below the target = no commission that week. Above it = you earn on everything over.</p>
+        </div>`;
+    }else{
+      tierExplain=`
+        <div style="background:#f8f5eb;border-radius:8px;padding:20px;margin:16px 0">
+          <h4 style="color:#1a2e1f;margin-bottom:12px">How Your Commission Works</h4>
+          <p style="margin-bottom:12px">Your commission has two tiers — like levels in a game. The more revenue you bring in, the higher your earning rate.</p>
+          <div style="background:#fff;border:1px solid #ddd;border-radius:6px;padding:16px;margin:12px 0">
+            <p style="font-weight:600;color:#1a2e1f;margin-bottom:8px">Tier 1 — The Starter</p>
+            <p style="margin-bottom:4px">Kicks in at: <strong>${fmt(d.t1ui)}</strong> weekly revenue (~${d.t1c} haircuts)</p>
+            <p>Rate: <strong>${(st.t1Rate*100).toFixed(1)}%</strong> on every dollar between ${fmt(d.t1ui)} and ${fmt(d.t2ui)}</p>
+          </div>
+          <div style="background:#fff;border:1px solid #ddd;border-radius:6px;padding:16px;margin:12px 0">
+            <p style="font-weight:600;color:#1a2e1f;margin-bottom:8px">Tier 2 — The Accelerator</p>
+            <p style="margin-bottom:4px">Kicks in at: <strong>${fmt(d.t2ui)}</strong> weekly revenue (~${d.t2c} haircuts)</p>
+            <p>Rate: <strong>${(st.t2Rate*100).toFixed(1)}%</strong> on every dollar above ${fmt(d.t2ui)}</p>
+          </div>
+          <p style="font-size:13px;color:#666;margin-top:8px">Below Tier 1 = no commission. Hit Tier 1 = start earning. Hit Tier 2 = earn even faster.</p>
+        </div>`;
+    }
+  }else{
+    tierExplain='<div style="background:#f8f5eb;border-radius:8px;padding:20px;margin:16px 0"><p>No service commission applies to your current role.</p></div>';
+  }
+  
+  // Worked example
+  let exampleHtml='';
+  if(st.comm>0&&!s.noComm&&exCommWhole>0){
+    const occRows=occScenarios.map(x=>`
+      <tr>
+        <td style="padding:6px 0">${(x.occ*100).toFixed(0)}%</td>
+        <td style="padding:6px 0">${x.cuts}</td>
+        <td style="padding:6px 0">${fmt(x.riInc)}</td>
+        <td style="padding:6px 0;color:#c9a94e;font-weight:600">${fmt(x.whole)}</td>
+        <td style="padding:6px 0">${fmt(x.cGross)}</td>
+      </tr>`).join('');
+    exampleHtml=`
+      <div style="background:#1a2e1f;color:#f0e8d4;border-radius:8px;padding:24px;margin:20px 0">
+        <h4 style="color:#c9a94e;margin-bottom:16px">Worked Example — ${exCuts} Haircuts in a Week</h4>
+        <p style="margin-bottom:16px;font-size:13px;opacity:0.8">Let's say you do ${exCuts} haircuts at $${st.price} each. Here's exactly how your pay breaks down:</p>
+        <table style="width:100%;font-size:14px;color:#f0e8d4">
+          <tr><td style="padding:6px 0">Revenue on Fresha (your unlock number)</td><td style="text-align:right;font-weight:600">${fmt(exRevInc)}</td><td style="padding-left:12px;font-size:12px;opacity:0.6">Fresha shows inc GST — this is what we compare to your unlock</td></tr>
+          <tr><td style="padding:6px 0;opacity:0.6">Minus GST (ATO money)</td><td style="text-align:right;opacity:0.6">−${fmt(exRevInc-exRevEx)}</td><td style="padding-left:12px;font-size:12px;opacity:0.4">Never yours — sent to the ATO</td></tr>
+          <tr style="border-top:1px solid rgba(240,232,212,0.2)"><td style="padding:6px 0">Actual revenue (ex GST)</td><td style="text-align:right;font-weight:600">${fmt(exRevEx)}</td><td style="padding-left:12px;font-size:12px;opacity:0.6">Commission is calculated on this number</td></tr>
+
+          <tr><td colspan="3" style="padding:16px 0 6px;font-size:11px;text-transform:uppercase;letter-spacing:1px;color:#c9a94e">Your Commission This Week</td></tr>
+          <tr><td style="padding:6px 0;font-weight:600">Whole commission (inc super)</td><td style="text-align:right;font-weight:700;font-size:16px;color:#c9a94e">${fmt2(exCommWhole)}</td><td style="padding-left:12px;font-size:12px;opacity:0.6">The whole number — before it splits</td></tr>
+          <tr><td style="padding:6px 0;opacity:0.75;padding-left:16px">↳ Super (${(SUPER_RATE*100).toFixed(0)}%) into your super fund</td><td style="text-align:right;opacity:0.75">${fmt2(exSuper)}</td><td style="padding-left:12px;font-size:12px;opacity:0.5">You don't see this in your bank — it goes to super</td></tr>
+          <tr><td style="padding:6px 0;opacity:0.75;padding-left:16px">↳ Gross commission (on your payslip)</td><td style="text-align:right;opacity:0.9;font-weight:600">${fmt2(exCommGross)}</td><td style="padding-left:12px;font-size:12px;opacity:0.5">Added to your base, then taxed</td></tr>
+
+          <tr><td colspan="3" style="padding:16px 0 6px;font-size:11px;text-transform:uppercase;letter-spacing:1px;color:#c9a94e">Your Total Pay That Week</td></tr>
+          <tr><td style="padding:6px 0">Base (before tax)</td><td style="text-align:right">${fmt2(d.wb)}</td><td></td></tr>
+          <tr><td style="padding:6px 0">+ Gross commission</td><td style="text-align:right">${fmt2(exCommGross)}</td><td></td></tr>
+          <tr style="border-top:1px solid rgba(240,232,212,0.3)"><td style="padding:8px 0;font-weight:600">Gross pay (before tax)</td><td style="text-align:right;font-weight:700;font-size:16px;color:#c9a94e">${fmt2(d.wb+exCommGross)}</td><td style="padding-left:12px;font-size:12px;opacity:0.6">Tax comes out of this</td></tr>
+        </table>
+        <p style="margin-top:16px;font-size:12px;opacity:0.7;line-height:1.5">
+          <strong style="color:#c9a94e">Tax note:</strong> If your total annual income lands between <strong>$45,001 and $135,000</strong>, the ATO takes <strong>30c + 2c Medicare</strong> out of every dollar above $45k — roughly a third. Your actual take-home depends on your total earnings for the year, HECS, offsets, and your tax file number declaration. Use the ATO simple tax calculator for a real number.
+        </p>
+      </div>
+
+      <div style="background:var(--bg);border-radius:8px;padding:20px;margin:16px 0">
+        <h4 style="color:var(--gold);margin-bottom:12px">What You Earn at Different Booking Levels</h4>
+        <p style="margin-bottom:12px;font-size:13px;color:var(--text-dim)">A full week is ${MAX_CUTS} haircut slots. Here's what you'd earn at different occupancy levels:</p>
+        <table style="width:100%">
+          <thead><tr>
+            <th style="text-align:left">Occupancy</th>
+            <th style="text-align:left">Haircuts</th>
+            <th style="text-align:left">Revenue (inc GST)</th>
+            <th style="text-align:left">Commission (whole, inc super)</th>
+            <th style="text-align:left">Gross (to you)</th>
+          </tr></thead>
+          <tbody>${occRows}</tbody>
+        </table>
+        <p style="margin-top:12px;font-size:13px;color:var(--text-dim)"><strong style="color:var(--cream)">"Commission (whole, inc super)"</strong> is your total earned — the super portion goes to your super fund, the gross portion is added to your payslip.</p>
+      </div>`;
+  }
+  
+  out.innerHTML=`<div class="card" style="max-width:800px">
+    <div style="text-align:center;margin-bottom:24px">
+      <div style="font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:700;color:var(--gold);letter-spacing:4px">SONDER MENS</div>
+      <div style="color:var(--text-dim);font-size:14px;margin-top:4px">Your Pay Structure</div>
+    </div>
+    <hr class="divider">
+    
+    <h3 style="font-size:24px;margin-bottom:4px">${s.name}</h3>
+    <p class="text-dim">${st.label} · ${s.loc&&s.loc!=='unassigned'?s.loc:''}</p>
+    
+    <hr class="divider">
+    
+    <div style="background:var(--bg);border-radius:8px;padding:20px;margin:16px 0">
+      <h4 style="color:var(--gold);margin-bottom:12px">Your Base Pay</h4>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div><span class="text-dim text-sm">Annual Salary</span><div style="font-size:20px;font-weight:600;color:var(--cream)">${fmt(st.base)}</div></div>
+        <div><span class="text-dim text-sm">Weekly (before tax)</span><div style="font-size:20px;font-weight:600;color:var(--cream)">${fmt2(d.wb)}</div></div>
+      </div>
+      <p style="margin-top:12px;font-size:13px;color:var(--text-dim)">This is your guaranteed pay every week regardless of how many haircuts you do. On top of this, your employer pays ${(SUPER_RATE*100).toFixed(0)}% super into your super fund.</p>
+    </div>
+    
+    ${tierExplain}
+    ${exampleHtml}
+    
+    <div style="background:var(--bg);border-radius:8px;padding:20px;margin:16px 0">
+      <h4 style="color:var(--gold);margin-bottom:12px">Product Commission</h4>
+      <p style="margin-bottom:12px">Every product you sell earns you extra on top of your service commission. The rate depends on how much product you sell in total that week — the more you sell, the more each one is worth.</p>
+      <p style="margin-bottom:12px;font-size:13px;color:var(--text-dim)">Average prices: <strong style="color:var(--cream)">Blak $39.95</strong> · <strong style="color:var(--cream)">American Crew $29.95</strong> (both inc GST).</p>
+      <table style="margin-top:8px">
+        <thead><tr><th>Your Weekly Product Sales</th><th>Blak</th><th>American Crew</th></tr></thead>
+        <tbody>
+          <tr><td>$0 – $149</td><td>$0 each</td><td>$0 each</td></tr>
+          <tr><td>$150 – $299</td><td>$6 each</td><td>$2 each</td></tr>
+          <tr><td>$300 – $449</td><td>$10 each</td><td>$4.50 each</td></tr>
+          <tr><td>$450+</td><td>$13 each</td><td>$4.50 each</td></tr>
+        </tbody>
+      </table>
+      <p style="margin-top:12px;font-size:13px;color:var(--text-dim)">The rates above are the <strong style="color:var(--cream)">base per product (ex super)</strong>. Just like service commission, your employer pays an extra 12% super on top of these amounts.</p>
+
+      <div style="background:#1a2e1f;color:#f0e8d4;border-radius:6px;padding:14px;margin-top:14px">
+        <p style="font-size:13px;margin-bottom:6px;color:#c9a94e;text-transform:uppercase;letter-spacing:1px">Example — $359.55 Blak Week (9 bottles)</p>
+        <p style="font-size:14px;line-height:1.6">You sell 9 Blak at $39.95 each = <strong>$359.55 total product sales</strong>. That puts you in the <strong>$300–$449 tier</strong> at $10/bottle base.</p>
+        <table style="width:100%;font-size:13px;margin-top:8px;color:#f0e8d4">
+          <tr><td style="padding:4px 0">Base commission: 9 × $10</td><td style="text-align:right">$90.00</td></tr>
+          <tr><td style="padding:4px 0;opacity:0.75">+ Super (12%) on top</td><td style="text-align:right;opacity:0.75">$10.80</td></tr>
+          <tr style="border-top:1px solid rgba(240,232,212,0.2)"><td style="padding:6px 0;font-weight:600">Whole commission (inc super)</td><td style="text-align:right;font-weight:700;color:#c9a94e">$100.80</td></tr>
+          <tr><td style="padding:4px 0;opacity:0.65;padding-left:16px">↳ Gross on your payslip</td><td style="text-align:right;opacity:0.75">$90.00</td></tr>
+          <tr><td style="padding:4px 0;opacity:0.65;padding-left:16px">↳ Into your super fund</td><td style="text-align:right;opacity:0.75">$10.80</td></tr>
+        </table>
+      </div>
+
+      <div style="background:#f8f5eb;border:1px solid var(--gold-dim);border-radius:6px;padding:14px;margin-top:10px">
+        <p style="font-size:13px;margin-bottom:6px;color:var(--gold);text-transform:uppercase;letter-spacing:1px">The Ideal Week</p>
+        <p style="font-size:14px;line-height:1.6;color:#1a2e1f;margin-bottom:8px">Column 95% booked (~60 haircuts) <strong>and</strong> $400+ in product sales. Example: 60 haircuts at $${st.price} + 10 Blak at $39.95 = $${(60*st.price+10*39.95).toFixed(0)} in total sales.</p>
+        <table style="width:100%;font-size:13px;color:#1a2e1f">
+          <tr><td style="padding:4px 0">Service commission (whole, inc super)</td><td style="text-align:right;font-weight:600">${fmt2(calcComm(st,60*st.price,s.incGst)*(1+SUPER_RATE))}</td></tr>
+          <tr><td style="padding:4px 0">Product commission (whole, inc super)</td><td style="text-align:right;font-weight:600">${fmt2(10*13*(1+SUPER_RATE))}</td></tr>
+          <tr><td style="padding:4px 0">Base pay (before tax)</td><td style="text-align:right;font-weight:600">${fmt2(d.wb)}</td></tr>
+          <tr style="border-top:1px solid var(--gold-dim)"><td style="padding:6px 0;font-weight:700;color:var(--gold)">Total that week (whole, inc super)</td><td style="text-align:right;font-weight:700;color:var(--gold)">${fmt2(d.wb+calcComm(st,60*st.price,s.incGst)*(1+SUPER_RATE)+10*13*(1+SUPER_RATE))}</td></tr>
+        </table>
+        <p style="font-size:12px;margin-top:8px;color:#1a2e1f;opacity:0.7">Do this consistently and you're pulling the biggest numbers this structure can produce.</p>
+      </div>
+    </div>
+    
+    <div style="background:var(--bg);border-radius:8px;padding:20px;margin:16px 0">
+      <h4 style="color:var(--gold);margin-bottom:12px">Understanding Your Pay</h4>
+      <div style="margin-bottom:12px">
+        <p style="margin-bottom:8px"><strong style="color:var(--cream)">Whole Commission (inc super)</strong> — The total you earn each week from service + products, including the super that your employer adds on top. This number gets split two ways: the super portion goes to your super fund, the rest is added to your payslip as gross.</p>
+        <p style="margin-bottom:8px"><strong style="color:var(--cream)">Super (${(SUPER_RATE*100).toFixed(0)}%)</strong> — Your employer's contribution to your super fund. You don't see it in your bank account but it's yours for retirement.</p>
+        <p style="margin-bottom:8px"><strong style="color:var(--cream)">Gross Pay</strong> — Base + gross commission. This is the big number on your payslip before tax comes out.</p>
+        <p style="margin-bottom:8px"><strong style="color:var(--cream)">PAYG Tax</strong> — The ATO takes this out of your gross pay each week. If your total income for the year lands between <strong>$45,001 and $135,000</strong> (most barbers here), they take 30c + 2c Medicare = <strong>32c</strong> out of every dollar above $45k. Below $45k is taxed lower.</p>
+        <p><strong style="color:var(--cream)">Net Pay (take-home)</strong> — What actually lands in your bank account. Gross minus PAYG tax.</p>
+      </div>
+    </div>
+    
+    <div style="background:var(--bg);border-radius:8px;padding:20px;margin:16px 0">
+      <h4 style="color:var(--gold);margin-bottom:12px">Quick Tips</h4>
+      <p style="margin-bottom:8px">✓ The revenue number you see on <strong>Fresha includes GST</strong> — that's only used to check if you've hit your <strong>unlock</strong>. The actual commission is calculated on the <strong>ex-GST</strong> figure (Fresha number ÷ 1.1)</p>
+      <p style="margin-bottom:8px">✓ Commission is calculated <strong>every week</strong> based on that week's performance</p>
+      <p style="margin-bottom:8px">✓ You don't need to track it yourself — it's calculated automatically from Fresha data</p>
+      <p>✓ Your base pay stays the same even in quiet weeks — commission is a bonus on top</p>
+    </div>
+    
+    <hr class="divider">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px">
+      <div style="background:var(--bg);border-radius:8px;padding:16px;text-align:center">
+        <span class="text-dim text-sm">Max Weekly Earning</span>
+        <div style="font-size:22px;font-weight:700;color:var(--gold)">${fmt2(d.wb+d.commMax)}</div>
+        <span class="text-sm text-dim">base + commission</span>
+      </div>
+      <div style="background:var(--bg);border-radius:8px;padding:16px;text-align:center">
+        <span class="text-dim text-sm">Max Annual Package</span>
+        <div style="font-size:22px;font-weight:700;color:var(--gold)">${fmt(st.base+st.comm)}</div>
+        <span class="text-sm text-dim">ex super</span>
+      </div>
+    </div>
+  </div>`;
+}
+
+// ==================== TAB NAV ====================
+function showTab(id){
+  document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active');
+  const map={'rate-builder':0,'wage-analysis':1,tester:2,calculate:3,profiles:4,onboarding:5};
+  document.querySelectorAll('.tab-btn')[map[id]]?.classList.add('active');
+  if(id==='rate-builder')renderRB();
+  if(id==='wage-analysis')renderWageAnalysis();
+  if(id==='tester')runTester();
+  if(id==='calculate'&&perfData)tryCalc();
+  if(id==='profiles')renderProfiles();
+  if(id==='onboarding')popOnboard();
+}
+
+// ==================== INIT ====================
+load();renderRB();renderProfiles();runTester();popOnboard();
+</script>
+</body>
+</html>
