@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sonder Mens</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%}
+body{
+  font-family:'Inter',system-ui,-apple-system,sans-serif;
+  background:#0f1a12;
+  color:#f0e8d4;
+  display:flex;align-items:center;justify-content:center;
+  min-height:100vh;
+  padding:20px;
+}
+.card{
+  background:#1a2e1f;
+  border:1px solid #2a3f2e;
+  border-radius:12px;
+  padding:48px 40px;
+  max-width:360px;
+  width:100%;
+  text-align:center;
+  box-shadow:0 10px 40px rgba(0,0,0,0.4);
+}
+.brand{
+  font-family:'Cormorant Garamond',serif;
+  font-size:34px;
+  font-weight:700;
+  color:#c9a94e;
+  letter-spacing:5px;
+  margin-bottom:4px;
+}
+.sub{
+  color:#8b9b8f;
+  font-size:12px;
+  letter-spacing:2px;
+  text-transform:uppercase;
+  margin-bottom:32px;
+}
+label{
+  display:block;
+  color:#8b9b8f;
+  font-size:12px;
+  letter-spacing:1px;
+  text-transform:uppercase;
+  margin-bottom:10px;
+}
+input[type="password"]{
+  width:100%;
+  background:#0f1a12;
+  border:1px solid #2a3f2e;
+  color:#f0e8d4;
+  padding:14px 16px;
+  font-size:20px;
+  text-align:center;
+  letter-spacing:8px;
+  border-radius:8px;
+  font-family:inherit;
+  outline:none;
+  transition:border-color .2s;
+}
+input[type="password"]:focus{border-color:#c9a94e}
+button{
+  width:100%;
+  margin-top:16px;
+  background:#c9a94e;
+  color:#0f1a12;
+  border:none;
+  padding:14px;
+  font-size:14px;
+  font-weight:600;
+  letter-spacing:2px;
+  text-transform:uppercase;
+  border-radius:8px;
+  cursor:pointer;
+  font-family:inherit;
+  transition:opacity .2s;
+}
+button:hover{opacity:.88}
+.err{
+  color:#d97a6c;
+  font-size:13px;
+  margin-top:12px;
+  min-height:18px;
+}
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="brand">SONDER</div>
+  <div class="sub">Pay Calculator</div>
+  <label for="pin">Enter PIN</label>
+  <input type="password" id="pin" inputmode="numeric" pattern="[0-9]*" maxlength="8" autofocus>
+  <button onclick="check()">Unlock</button>
+  <div class="err" id="err"></div>
+</div>
+<script>
+const HASH = '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4'; // PIN: 1234
+
+async function sha256(s){
+  const buf = new TextEncoder().encode(s);
+  const hash = await crypto.subtle.digest('SHA-256', buf);
+  return Array.from(new Uint8Array(hash)).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+
+async function check(){
+  const pin = document.getElementById('pin').value;
+  const err = document.getElementById('err');
+  if(!pin){err.textContent='Enter a PIN';return}
+  const h = await sha256(pin);
+  if(h === HASH){
+    sessionStorage.setItem('sonder_unlocked','1');
+    location.href = '/pay-calc/app.html';
+  } else {
+    err.textContent = 'Incorrect PIN';
+    document.getElementById('pin').value='';
+  }
+}
+
+// If already unlocked this session, skip login
+if(sessionStorage.getItem('sonder_unlocked')==='1'){
+  location.href = '/pay-calc/app.html';
+}
+
+document.getElementById('pin').addEventListener('keydown', e=>{
+  if(e.key==='Enter') check();
+});
+</script>
+</body>
+</html>
